@@ -4,6 +4,7 @@ import "@biconomy/web3-auth/dist/src/style.css";
 import { ethers } from 'ethers'
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import Dashboard from "./Dashboard";
 
 const HomePage = () => {
 
@@ -73,7 +74,7 @@ const HomePage = () => {
       <div className="btn btn-active btn-secondary" onClick={openSocialSignon}>Sign In</div>
     </>
 
-  return <></>
+  return <Dashboard account={account} privateKey={privateKey} logout={logout} />
 }
 
 export default HomePage
