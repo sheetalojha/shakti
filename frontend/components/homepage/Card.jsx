@@ -3,7 +3,7 @@ import lighthouse from '@lighthouse-web3/sdk';
 
 import { ethers } from "ethers";
 
-const Card = ({ note, index, privateKey, provider }) => {
+const Card = ({ note, index, loginProvider, provider }) => {
   const [content, setContent] = useState('')
   const [isPublic, setIsPublic] = useState(false)
   const [loading, setLoading] = useState(true)
@@ -12,7 +12,7 @@ const Card = ({ note, index, privateKey, provider }) => {
 
 
   const encryptionSignature = async () => {
-    const wallet = new ethers.Wallet(privateKey, provider);
+    const wallet = await loginProvider.getSigner();
     const address = await wallet.getAddress();
     const messageRequested = (await lighthouse.getAuthMessage(address)).data.message;
     const signedMessage = await wallet.signMessage(messageRequested);
@@ -67,7 +67,7 @@ const Card = ({ note, index, privateKey, provider }) => {
   }
 
   const makePublic = async () => {
-    if(loadingPublic) {
+    if (loadingPublic) {
       window.open(`https://shibuya.subscan.io/tx/${hashTx}`, '_blank')
       return;
     }
@@ -76,8 +76,9 @@ const Card = ({ note, index, privateKey, provider }) => {
 
     if (hash != note.hashOfOriginalNote) return; // This means the public content is not same as encrypted content.
 
+    setLoadingPublic(true)
     const wallet = new ethers.Wallet(process.env.NEXT_PUBLIC_SENDER_PRIVATE_KEY, provider);
-    const userWallet = new ethers.Wallet(privateKey, provider);
+    const userWallet = await loginProvider.getSigner();
     const userAdd = await userWallet.getAddress()
 
     const output = await lighthouse.uploadText(content, process.env.NEXT_PUBLIC_LIGHTHOUSE_STORAGE);
@@ -115,8 +116,7 @@ const Card = ({ note, index, privateKey, provider }) => {
     wallet.provider.on('error', (response) => {
       console.log('error event received via emitter', response);
     });
-    
-    setLoadingPublic(true)
+
     // Sending gasless transaction
     const txResponse = await wallet.sendTransaction(tx);
     console.log('userOp hash', txResponse.hash);
@@ -125,7 +125,7 @@ const Card = ({ note, index, privateKey, provider }) => {
     const txReciept = await txResponse.wait();
     console.log('Tx hash', txReciept.transactionHash);
 
-    
+
     setLoadingPublic(false)
     setIsPublic(true)
   }
@@ -141,7 +141,7 @@ const Card = ({ note, index, privateKey, provider }) => {
       <p>{loading ? "Loading..." : content}</p>
       <div class="badge badge-md">23.07.2023</div>{!isPublic ? <div className="badge badge-secondary">Private</div> : <></>}
       <div className="card-actions justify-end">
-        {!isPublic ? <button onClick={makePublic} className="btn btn-primary">{loadingPublic ? "See Tx" : "Make Public" }</button> : <></>}
+        {!isPublic ? <button onClick={makePublic} className={"btn btn-primary" + (loadingPublic && hashTx == "" ? " btn-disabled" : "")}>{loadingPublic ? "See Txn" : "Make Public"}</button> : <></>}
       </div>
     </div>
   </div>

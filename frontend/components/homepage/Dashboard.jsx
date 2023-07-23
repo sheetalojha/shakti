@@ -21,7 +21,7 @@ const customStyles = {
   },
 };
 
-const Dashboard = ({ logout, privateKey, account }) => {
+const Dashboard = ({ logout, loginProvider, account }) => {
 
   const [note, setNote] = useState('')
   const [oldNotes, setOldNotes] = useState([])
@@ -98,8 +98,6 @@ const Dashboard = ({ logout, privateKey, account }) => {
     wallet.provider.on('error', (response) => {
       console.log('error event received via emitter', response);
     });
-
-    setIsLoading(true)
     // Sending gasless transaction
     const txResponse = await wallet.sendTransaction(tx);
     console.log('userOp hash', txResponse.hash);
@@ -113,8 +111,8 @@ const Dashboard = ({ logout, privateKey, account }) => {
   }
 
   const encryptionSignature = async () => {
-    const wallet = new ethers.Wallet(privateKey, provider);
-    const address = scw;
+    const wallet = await loginProvider.getSigner();
+    const address = await wallet.getAddress();
     const messageRequested = (await lighthouse.getAuthMessage(address)).data.message;
     const signedMessage = await wallet.signMessage(messageRequested);
     return ({
@@ -126,6 +124,7 @@ const Dashboard = ({ logout, privateKey, account }) => {
   const save = async () => {
     if (note.length < 3) return;
 
+    setIsLoading(true)
     const sig = await encryptionSignature();
     const response = await lighthouse.textUploadEncrypted(
       note,
@@ -166,7 +165,7 @@ const Dashboard = ({ logout, privateKey, account }) => {
   };
 
   return <div className="w-full h-full flex-1">
-    <div className="navbar bg-base-100 fixed flex w-screen top-0 z-10 box-shadow-10">
+    <div className="navbar bg-base-100 fixed flex w-screen top-0 left-0 px-10 z-10 box-shadow-10">
       <div className="flex-1 flex-row">
         <Image src={'/assets/shakti.png'} height={80} width={80} />
         <a className="btn btn-ghost normal-case text-xl">Shakti</a>
@@ -195,7 +194,7 @@ const Dashboard = ({ logout, privateKey, account }) => {
       <h1 className="text-xl font-bold mb-2">Past Experiences:</h1>
       <div className="w-full grid grid-rows-2 gap-4 grid-flow-row-dense ">
         {oldNotes.map((note, index) => {
-          return <Card key={note.encryptedContentCID} index={index} privateKey={privateKey} provider={provider} note={note} />
+          return <Card key={note.encryptedContentCID} index={index} loginProvider={loginProvider} provider={provider} note={note} />
         })}
       </div>
     </div>

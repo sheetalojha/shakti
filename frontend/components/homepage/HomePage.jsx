@@ -1,5 +1,7 @@
-import SocialLogin from "@biconomy/web3-auth";
-import "@biconomy/web3-auth/dist/src/style.css";
+import { Web3AuthNoModal } from "@web3auth/no-modal";
+import { EthereumPrivateKeyProvider } from "@web3auth/ethereum-provider";
+import { OpenloginAdapter } from "@web3auth/openlogin-adapter";
+import { WALLET_ADAPTERS } from "@web3auth/base";
 
 import { ethers } from 'ethers'
 import { useEffect, useState } from "react";
@@ -7,58 +9,76 @@ import Image from "next/image";
 import Dashboard from "./Dashboard";
 
 const HomePage = () => {
-
-  const [privateKey, setPrivateKey] = useState()
-
   const [account, setAccount] = useState('')
   const [loading, setLoading] = useState(false)
-  const socialLogin = new SocialLogin()
+  const [web3Auth, setWeb3Auth] = useState()
+  const [loginProvider, setLoginProvider] = useState()
 
   const checkLogin = async () => {
-
-    if (!socialLogin?.provider) return;
+    if (!web3Auth) return -1;
     // create a provider from the social login provider that 
     // will be used by the smart account package of the Biconomy SDK
     const provider = new ethers.providers.Web3Provider(
-      socialLogin.provider,
+      web3Auth.provider,
     );
+
     // get list of accounts available with the provider
     const accounts = await provider.listAccounts();
-    if (accounts.length == 0) return;
+    if (accounts.length == 0) return -1;
 
-    const pvK = await socialLogin.getPrivateKey()
-
-    setPrivateKey(pvK)
+    setLoginProvider(provider)
     setAccount(accounts[0])
     setLoading(false)
   }
 
   const initSocial = async () => {
-    await socialLogin.init({
-      chainId: '0x13881',
-      network: 'testnet',
-      whitelistUrls: ['https://shakti-alpha.vercel.app/']
-    })
+    const chainConfig = {
+      chainNamespace: "eip155",
+      chainId: "0x1",
+      rpcTarget: "https://rpc.ankr.com/eth",
+      displayName: "Ethereum Mainnet",
+      blockExplorer: "https://goerli.etherscan.io",
+      ticker: "ETH",
+      tickerName: "Ethereum",
+    };
+    const web3auth = new Web3AuthNoModal({
+      clientId: process.env.NEXT_PUBLIC_WEB3_AUTH_CLIENT_ID, // Get your Client ID from Web3Auth Dashboard
+      chainConfig,
+    });
+
+    setWeb3Auth(web3auth)
+    const privateKeyProvider = new EthereumPrivateKeyProvider({ config: { chainConfig } });
+
+    const openloginAdapter = new OpenloginAdapter({
+      privateKeyProvider,
+    });
+    web3auth.configureAdapter(openloginAdapter);
+    await web3auth.init();
   }
 
   useEffect(() => {
-    initSocial()
+    setLoading(true)
+    initSocial().then(() => {
+      setLoading(false)
+    })
   }, [])
 
   const openSocialSignon = async () => {
-    if (!socialLogin?.provider)
-      await socialLogin.socialLogin('google')
+    const rep = await checkLogin()
+    if (rep != -1) return;
 
+    await web3Auth.connectTo(WALLET_ADAPTERS.OPENLOGIN, {
+      loginProvider: "google",
+    });
     setLoading(true)
     checkLogin()
   }
 
   const logout = async () => {
-    await socialLogin.logout()
+    await web3Auth.logout()
 
     await initSocial()
     setAccount('')
-    setPrivateKey()
   }
 
   if (loading)
@@ -75,7 +95,7 @@ const HomePage = () => {
       <div className="btn btn-active btn-secondary" onClick={openSocialSignon}>Sign In</div>
     </>
 
-  return <Dashboard account={account} privateKey={privateKey} logout={logout} />
+  return <Dashboard account={account} loginProvider={loginProvider} logout={logout} />
 }
 
 export default HomePage
