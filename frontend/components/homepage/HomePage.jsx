@@ -36,7 +36,8 @@ const HomePage = () => {
   const initSocial = async () => {
     await socialLogin.init({
       chainId: '0x13881',
-      network: 'testnet'
+      network: 'testnet',
+      whitelistUrls: ['https://shakti-alpha.vercel.app/']
     })
   }
 
