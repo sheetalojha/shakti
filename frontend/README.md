@@ -1,34 +1,34 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Shakti (means Power in Hindi)
+Empower Victims of Workplace harrasment with Evidence of Experience using Blockchain and Gen AI.
 
-## Getting Started
+## Motivation:
+More than 50% of working professionals face sexual harassment at workplace, whether it be inappropriate touching or physical advances at work, a survey done by WICCI Council of Ethics revealed. “And it doesn’t just happen once” they say. **It is said that 70% of these cases go unreported for the fear of not being believed and/or loss of employment.**
 
-First, run the development server:
+- The government of India passed the Sexual Harassment of Women at Workplace (Prevention, Protection and Redressal Act) (POSH Act)in 2013.
+- 10 years after the act, the SC flagged that most workplaces still do not have an Internal Complaints Committee mandated by it.
+- the Posh Act also fails victims where the court tends to rely on evidence and the SC noted that **failure to provide evidence in cases of sexual harassment does not imply absence of crime**
+- Harassment at workplace starts subtly, the victims are almost unsure when to report it and are left doubting themselves if what happened to them would account to sexual harassment or not.
 
-```bash
-npm run dev
-# or
-yarn dev
-```
+## Solution:
+Shakti provides:
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- provable track record of your experiences of harrassment to act as evidence
+- seeking help or advice to deal with the situation at hand
+- ensuring privacy without revealing identity at all
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
+Using:
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+- **Web Interface**: where employees can maintain notes/records about the incident(s)
+- **Smart Contract**: encrypted note hash and encrypted IPFS CID will be stored in smart contract transactions. We are leveraging Web3 Auth Social Login, so users don't need to create any wallets or download extensions. The contracts are deployed on Shibuya Testnet of Astar. [Here](https://shibuya.subscan.io/account/0x89b2F84bd0d79c285577e323B330B41C2c940608?tab=contract).
+- **Generative AI Model**: which will provide continuous support based on the guidelines from the government and the company’s compliance policies & recognise the severity of the incident from the notes and the kind of help and protection the victim could seek
+- At the time of reporting they can choose to reveal this information and it can be produced as evidence to the complaints committee with the **proof of timestamp**.
 
-## Learn More
+Blockchain is meant to keep an immutable series of records, and we used it for storing experiences of women in tech for it. 
 
-To learn more about Next.js, take a look at the following resources:
+## Plans ahead
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- I got to know about the hackathon very late, so the UI is unfinished there are lot of improvements can be done on UI. But **UX** of the website is very scalable.
+- **Mass Adoption** it is meant for mass adoption in offices / working places as the users don't even need to know about blockchain at all. As we use social login to create non-custodial wallets for them using Web3Auth and sponored transaction using a paymaster account.
+- As of now, the AI modal gives advice based on **Indian Laws** but we plan to broaden the scope of this to international & country specific laws. With more call to actions.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
